@@ -23,10 +23,16 @@ const routes: Array<RouteConfig> = [
     name: 'login',
     component: () => import(/* webpackChunkName: "about" */ '../views/auth/LoginView.vue')
   },
+   {
+    path: '/register',
+    name: 'register',
+    component: () => import(/* webpackChunkName: "about" */ '../views/auth/RegisterView.vue')
+  },
   {
     path: '/ordersList',
     name: 'ordersList',
-    component: () => import(/* webpackChunkName: "about" */ '../views/orders/OrderList.vue')
+    component: () => import(/* webpackChunkName: "about" */ '../views/orders/OrderList.vue'),
+    meta: { requiresAuth: true }
   },
   { 
     path: '/order/create', 
@@ -47,5 +53,23 @@ const router = new VueRouter({
   base: process.env.BASE_URL,
   routes
 })
+
+router.beforeEach((to, from, next) => {
+    if (to.matched.some(record => record.meta.requiresAuth)) {
+        
+      const userToken = localStorage.getItem('userToken');
+
+      if (userToken) {
+          next();
+      } else {
+          next({ 
+              name: 'login', 
+              query: { redirect: to.fullPath } 
+          });
+      }
+    } else {
+      next();
+    }
+});
 
 export default router

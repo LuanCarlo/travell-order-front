@@ -41,10 +41,20 @@ export default {
         this.errorMessage = 'E-mail ou senha inválidos. Tente novamente.';
       }
     },
+    goToRegister() {
+      this.$router.push({ path: '/register' });
+    } 
   },
   mounted() {
    
     console.log('API Base URL:', process.env.VUE_APP_API_BASE_URL);
+
+    this.$notify({
+        group: 'foo',
+        title: 'Sucesso',
+        text: 'Dados atualizados com sucesso!',
+        type: 'success'
+    });
   },
 };
 </script>
@@ -79,6 +89,9 @@ export default {
       </div>
 
       <button type="submit" class="login-button">Entrar</button>
+      <div @click="goToRegister()" class="register-access">Registrar</div>
+
+
     </form>
   </div>
 </template>
@@ -153,5 +166,11 @@ input[type="password"] {
   margin-bottom: 20px;
   text-align: center;
   font-size: 0.9em;
+}
+
+.register-access {
+  margin-top: 5%;
+  text-decoration: underline;
+  cursor: pointer;
 }
 </style>

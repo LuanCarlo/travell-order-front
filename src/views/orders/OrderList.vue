@@ -113,6 +113,11 @@ export default {
           id: orderId 
         } 
       });
+    },
+    clearFilter() {
+
+      this.filterStatus = null;
+      this.getOrders();
     }
   }
 };
@@ -124,6 +129,9 @@ export default {
     <div class="header">
       <h1>Lista de Pedidos de Viagem</h1>
 
+      <button @click="clearFilter()" class="add-button">
+        Limpar
+      </button>
       <select 
         :value="filterStatus"
         @change="getOrders()"

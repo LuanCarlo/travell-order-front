@@ -22,7 +22,24 @@ const routes: Array<RouteConfig> = [
     path: '/login',
     name: 'login',
     component: () => import(/* webpackChunkName: "about" */ '../views/auth/LoginView.vue')
-  }
+  },
+  {
+    path: '/ordersList',
+    name: 'ordersList',
+    component: () => import(/* webpackChunkName: "about" */ '../views/orders/OrderList.vue')
+  },
+  { 
+    path: '/order/create', 
+    name: 'OrderCreate',
+    component: () => import(/* webpackChunkName: "about" */ '../views/orders/OrderForm.vue'),
+    meta: { requiresAuth: true } 
+  },
+  { 
+    path: '/order/editar/:id', 
+    name: 'OrderEdit',
+    component: () => import(/* webpackChunkName: "about" */ '../views/orders/OrderForm.vue'),
+    meta: { requiresAuth: true } 
+  },
 ]
 
 const router = new VueRouter({

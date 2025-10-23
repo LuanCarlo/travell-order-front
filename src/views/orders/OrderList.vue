@@ -140,24 +140,11 @@ export default {
     </div>
 
     <div v-else class="order-list">
-      <!-- <div 
-        v-for="order in orders" 
-        :key="order.id" 
-        class="order-item"
-      >
-        <div class="order-info">
-          <strong>#{{ order.id }} - {{ order.cliente }}</strong>
-        </div>
-        <div class="order-value">
-          {{ order.status }}
-        </div>
-      </div> -->
-
       <table class="order-table">
         <thead>
           <tr>
             <th>ID</th>
-            <th>Usuário</th>
+            <th>Solicitante</th>
             <th>Data de Partida</th>
             <th>Data de Retorno</th>
             <th>Status</th>
@@ -166,9 +153,9 @@ export default {
 
         <tbody>
           <tr v-for="order in orders" :key="order.id">
-            <td @click="editOrder(order.id)">{{ order.id }}</td>
+            <td @click="editOrder(order.id)" class="clicable-td">{{ order.id }}</td>
             
-            <td>{{ order.user }}</td>
+            <td @click="editOrder(order.id)" class="clicable-td">{{ order.user }}</td>
             
             <td>{{ order.departure_date }}</td>
             
@@ -182,9 +169,9 @@ export default {
               
               <select 
                 v-if="editingOrderId === order.id" 
-                :value="order.status"
+                :value="order.order_status_id"
                 @change="updateStatus(order, $event.target.value, order.status)"
-                class="status-select"
+                class="status-select-editable"
               >
                 <option 
                   v-for="option in ordersStatus" 
@@ -367,5 +354,31 @@ h1 {
 .status-badge.cancelado {
   background-color: #dc3545;
   color: white;
+}
+
+.status-select-editable {
+  width: 100%;
+  height: 100%;
+  padding: 2px 10px; 
+  border: 1px solid #007bff; /* Borda sutilmente azul para indicar foco/edição */
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 1em;
+  
+  -webkit-appearance: none; 
+  -moz-appearance: none;
+  appearance: none; 
+  
+  background-color: #f7f9fb; 
+  background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007bff%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13.2-5.4H18.6c-5%200-9.3%201.8-13.2%205.4A17.6%2017.6%200%200%200%200%2082.6c0%204.8%201.8%209.1%205.4%2013.2l128%20128c3.9%203.8%208.2%205.6%2013%205.6s9.1-1.8%2013-5.6l128-128c3.8-3.9%205.6-8.2%205.6-13.2%200-5-1.8-9.3-5.6-13.2z%22%2F%3E%3C%2Fsvg%3E');
+  background-repeat: no-repeat;
+  background-position: right 10px top 50%;
+  background-size: 10px auto;
+  
+  cursor: pointer;
+}
+
+.clicable-td {
+  cursor: pointer;
 }
 </style>

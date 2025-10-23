@@ -175,7 +175,7 @@ export default {
       
       <div v-if="isEditing" class="form-group">
         <label for="status">Status Atual</label>
-        <select id="status" v-model="order.status">
+        <select id="status" v-model="order.order_status_id">
           <option v-for="status in ordersStatus" :key="status.value" :value="status.value">
             {{ status.label }}
           </option>

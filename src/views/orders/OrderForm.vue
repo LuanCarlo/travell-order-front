@@ -1,9 +1,12 @@
 <script>
 import axios from 'axios';
+import LoadingSpinner from '@/components/LoadingSpinner.vue';
 
 export default {
   name: 'OrderFormView',
-  
+  components: {
+    LoadingSpinner,
+  },  
   data() {
     return {
       order: {
@@ -142,6 +145,8 @@ export default {
 
 <template>
   <div class="form-container">
+    <LoadingSpinner :show="isLoading" text="Buscando pedidos de viagem..." />
+
     <h1 class="title">{{ pageTitle }}</h1>
 
     <div v-if="isLoading && !order.cliente" class="status-message loading">

@@ -1,9 +1,12 @@
 <script>
 import axios from 'axios';
+import LoadingSpinner from '@/components/LoadingSpinner.vue';
 
 export default {
-  name: 'OrderListView', 
-  
+  name: 'OrderListView',
+  components: {
+    LoadingSpinner,
+  },  
   data() {
     return {
       orders: [], 
@@ -11,12 +14,10 @@ export default {
       editingOrderId: null,     
       isLoading: true, 
       error: null,
-      filters: [],
+      filterStatus: null,
       api : process.env.VUE_APP_API_BASE_URL,       
     };
-  },
-  
-
+  }, 
   mounted() {
     this.getOrders();
     this.getOrderStatus();
@@ -52,7 +53,7 @@ export default {
       let ordersStatus = [];
       
       try {
-        let data = await axios.get(`${this.api}orders/orderSatus`);
+        let data = await axios.get(`${this.api}orders/orderSatus?filterStatus=${this.filterStatus}`);
 
         if (data.data?.status == 200 && data.data?.record?.length > 0) {
 
@@ -119,8 +120,23 @@ export default {
 
 <template>
   <div class="orders-container">
+    <LoadingSpinner :show="isLoading" text="Buscando pedidos de viagem..." />
     <div class="header">
       <h1>Lista de Pedidos de Viagem</h1>
+
+      <select 
+        :value="filterStatus"
+        @change="getOrders()"
+        class="status-select"
+      >
+        <option 
+          v-for="option in ordersStatus" 
+          :key="option.value" 
+          :value="option.value"
+        >
+          {{ option.label }}
+        </option>
+      </select>
       <button @click="goToNewOrder" class="add-button">
         + Novo Pedido
       </button>
@@ -213,6 +229,7 @@ export default {
   margin-bottom: 25px;
   border-bottom: 2px solid #eee;
   padding-bottom: 15px;
+  gap: 15px;
 }
 
 h1 {
@@ -376,6 +393,32 @@ h1 {
   background-size: 10px auto;
   
   cursor: pointer;
+}
+
+.status-select {
+    padding: 10px 30px 10px 15px; 
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1em;
+    height: 40px; 
+    
+    background-color: #f7f7f7; 
+    background-repeat: no-repeat;
+    background-position: right 10px top 50%;
+    background-size: 10px auto; 
+    
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+.status-select:hover {
+    border-color: #007bff; 
+}
+
+.status-select:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
 }
 
 .clicable-td {

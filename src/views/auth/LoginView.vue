@@ -24,18 +24,18 @@ export default {
       }
 
       try {
-        const response = await axios.post(`${this.api}login`, {
+        const response = await axios.post(`login`, {
           email: this.email,
           password: this.password,
         });
 
         const token = response.data.token;
-        const user = response.data.token;
+        const user = response.data.user;
         
         localStorage.setItem('userToken', token);
         localStorage.setItem('user', user);
 
-        this.$router.push({ path: '/pedidos' });
+        this.$router.push({ path: '/ordersList' });
 
       } catch (error) {
         this.errorMessage = 'E-mail ou senha inválidos. Tente novamente.';

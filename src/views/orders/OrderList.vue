@@ -31,7 +31,7 @@ export default {
       this.error = null;
       
       try {
-        let data = await axios.get(`${this.api}orders`);
+        let data = await axios.get(`orders`);
 
         if (data.data?.status == 200 && data.data?.record?.length > 0) {
 
@@ -53,7 +53,7 @@ export default {
       let ordersStatus = [];
       
       try {
-        let data = await axios.get(`${this.api}orders/orderSatus?filterStatus=${this.filterStatus}`);
+        let data = await axios.get(`orders/orderSatus?filterStatus=${this.filterStatus}`);
 
         if (data.data?.status == 200 && data.data?.record?.length > 0) {
 
@@ -92,7 +92,7 @@ export default {
 
       try {
 
-        const response = await axios.patch(`${this.api}orders/updateStatusOrder/${order.id}`, {
+        const response = await axios.patch(`orders/updateStatusOrder/${order.id}`, {
          status:newStatus
         });
         

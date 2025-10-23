@@ -55,7 +55,7 @@ export default {
     async fetchOrder(id) {
       this.isLoading = true;
       try {
-        const data = await axios.get(`${this.api}orders/getOrder/${id}`); 
+        const data = await axios.get(`orders/getOrder/${id}`); 
     
         if (data.data.status == 200) {
 
@@ -85,10 +85,10 @@ export default {
         }
         
         if (this.isEditing) {
-          response = await axios.put(`${this.api}orders/update/${this.order.id}`, this.order);
+          response = await axios.put(`orders/update/${this.order.id}`, this.order);
           this.successMessage = 'Pedido atualizado com sucesso!';
         } else {
-          response =  await axios.post(`${this.api}orders/`, this.order);
+          response =  await axios.post(`orders/`, this.order);
           this.successMessage = 'Pedido criado com sucesso!';
           this.isEditing = true;
           this.order.id = response.id; 
@@ -113,7 +113,7 @@ export default {
       let ordersStatus = [];
       
       try {
-        let data = await axios.get(`${this.api}orders/orderSatus`);
+        let data = await axios.get(`orders/orderSatus`);
 
         if (data.data?.status == 200 && data.data?.record?.length > 0) {
 

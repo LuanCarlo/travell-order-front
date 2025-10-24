@@ -50,7 +50,7 @@ export default {
       this.isLoading = true;
       this.error = null;
 
-      let ordersStatus = [];
+      let ordersStatus = [{value:null, label: 'Status'}];
       
       try {
         let data = await axios.get(`orders/orderSatus?filterStatus=${this.filterStatus}`);
@@ -129,8 +129,8 @@ export default {
     <div class="header">
       <h1>Lista de Pedidos de Viagem</h1>
 
-      <button @click="clearFilter()" class="add-button">
-        Limpar
+      <button @click="clearFilter()" class="clear-button">
+        Limpar filtro
       </button>
       <select 
         :value="filterStatus"
@@ -256,8 +256,21 @@ h1 {
   transition: background-color 0.3s;
 }
 
+
 .add-button:hover {
   background-color: #0056b3;
+}
+
+.clear-button {
+  padding: 10px 15px;
+  background-color: #ff0000;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background-color 0.3s;
+  margin-right: -6%;
 }
 
 /* Estilos da Lista */

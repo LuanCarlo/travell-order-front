@@ -1,7 +1,7 @@
 import axios, { AxiosResponse, AxiosError, InternalAxiosRequestConfig } from 'axios';
 import router from '@/router'; 
 
-axios.defaults.baseURL = process.env.VUE_APP_API_BASE_URL || 'http://localhost:8000/api/';
+axios.defaults.baseURL = process.env.VUE_APP_API_BASE_URL + '/api/' || 'http://localhost:8000/api/';
 
 axios.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {

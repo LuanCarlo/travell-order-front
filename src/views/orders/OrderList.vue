@@ -176,6 +176,7 @@ export default {
           <tr>
             <th>ID</th>
             <th>Solicitante</th>
+            <th>Destino</th>
             <th>Data de Partida</th>
             <th>Data de Retorno</th>
             <th>Status</th>
@@ -187,6 +188,8 @@ export default {
             <td @click="editOrder(order.id)" class="clicable-td">{{ order.id }}</td>
             
             <td @click="editOrder(order.id)" class="clicable-td">{{ order.user }}</td>
+
+            <td>{{ order.destination }}</td>
             
             <td>{{ order.departure_date }}</td>
             

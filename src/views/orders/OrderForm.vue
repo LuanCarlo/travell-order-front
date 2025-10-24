@@ -21,8 +21,8 @@ export default {
       errorMessage: null,
       successMessage: null,
       ordersStatus: [],
+      originalOrderStatus: null,
       user:null,
-
     };
   },
   
@@ -70,6 +70,7 @@ export default {
 
             this.order = data.data.record;
             this.order.userName = this.order.user.name;
+            this.originalOrderStatus = this.order.order_status_id;
         } else {
             this.errorMessage = 'Erro ao carregar os dados do pedido de viagem.';
         }
@@ -127,6 +128,16 @@ export default {
             const errors = error.response.data.errors;
             errorMsg = Object.values(errors).flat().join(' | ');
         }
+
+        if (error.response && error.response.status === 403) {
+
+          if (error.response?.data?.message) {
+            errorMsg = error.response.data.message
+          }
+
+          this.order.order_status_id = this.originalOrderStatus;
+
+        }     
         
         this.errorMessage = errorMsg;
         
@@ -159,9 +170,9 @@ export default {
 
         this.ordersStatus = ordersStatus;
 
-      } catch (err) {
+      } catch (error) {
       
-        console.error("Falha ao buscar status:", err);
+        console.error("Falha ao buscar status:", error);
         this.error = 'Não foi possível carregar a lista de status. Tente novamente.';
 
         
@@ -233,7 +244,7 @@ export default {
       
       <div v-if="isEditing" class="form-group">
         <label for="status">Status Atual</label>
-        <select id="status" v-model="order.order_status_id" :disabled="canChangeStatus">
+        <select id="status" v-model="order.order_status_id" :disabled="!canChangeStatus">
           <option v-for="status in ordersStatus" :key="status.value" :value="status.value">
             {{ status.label }}
           </option>

@@ -119,8 +119,26 @@ export default {
 
       } catch (error) {
 
-        order.status = originalStatus;
-        alert('Erro ao atualizar o status do pedido. Tente novamente.');
+        order.order_status_id = originalStatus;
+
+        const statusArray = this.ordersStatus.filter(statusItem => statusItem.value == originalStatus);
+        order.status = statusArray[0]?.label;
+
+        let message = 'Erro ao atualizar o status do pedido. Tente novamente.';
+        if (error.response && error.response.status === 403) {
+
+          if (error.response?.data?.message) {
+            message = error.response.data.message
+          }
+        }     
+
+        this.$notify({
+          group: 'app-alerts',
+          title: 'Erro de Registro',
+          text: message,
+          type: 'error'
+        });
+        console.error(message);
       }
     },  
     goToNewOrder() {

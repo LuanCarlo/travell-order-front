@@ -44,6 +44,9 @@ export default {
       this.order.userName = this.user.name;
       this.order.user_id = this.user.id;
     }
+
+          console.log(this.isEditing, this.user.admin);
+
   },
 
   methods: {
@@ -159,7 +162,7 @@ export default {
       let ordersStatus = [];
       
       try {
-        let data = await axios.get(`orders/orderSatus`);
+        let data = await axios.get(`orders/orderStatus`);
 
         if (data.data?.status == 200 && data.data?.record?.length > 0) {
 
@@ -180,28 +183,30 @@ export default {
         this.isLoading = false;
       }
 
-    },
-    isEditable() {
-
-      if ((this.user.id == this.order.user_id || this.user.admin == 1) && this.order.order_status_id == 1){
-        return true;
-      }
-
-      return false;
-    },
-    canChangeStatus() {
-
-      if (this.isEditing == true && this.user.admin != 1){
-        return false;
-      }
-
-      return true;
     }
   },
   
   computed: {
     pageTitle() {
       return this.isEditing ? 'Editar Pedido #' + this.order.id : 'Novo Pedido';
+    },
+    isNotEditable() {
+
+      if (this.isEditing == false || (this.user.id == this.order.user_id || this.user.admin == 1) 
+      && (this.order.order_status_id == 1 || this.order.order_status_id == null)){
+        return false;
+      }
+
+      return true;
+    },
+    cantChangeStatus() {
+
+
+      if (this.isEditing == true && this.user.admin == 1){
+        return false;
+      }
+
+      return true;
     }
   }
 };
@@ -229,22 +234,22 @@ export default {
 
       <div class="form-group">
         <label for="user_id">Destino</label>
-        <input id="destination" v-model="order.destination" type="text" required>
+        <input id="destination" v-model="order.destination" type="text" required :disabled="isNotEditable">
       </div>
 
       <div class="form-group">
         <label for="departure_date">Data de Partida</label>
-        <input id="departure_date" v-model="order.departure_date" type="datetime-local" required>
+        <input id="departure_date" v-model="order.departure_date" type="datetime-local" required :disabled="isNotEditable">
       </div>
 
       <div class="form-group">
         <label for="return_date">Data de Retorno</label>
-        <input id="return_date" v-model="order.return_date" type="datetime-local" required>
+        <input id="return_date" v-model="order.return_date" type="datetime-local" required :disabled="isNotEditable">
       </div>
       
       <div v-if="isEditing" class="form-group">
         <label for="status">Status Atual</label>
-        <select id="status" v-model="order.order_status_id" :disabled="!canChangeStatus">
+        <select id="status" v-model="order.order_status_id" :disabled="cantChangeStatus">
           <option v-for="status in ordersStatus" :key="status.value" :value="status.value">
             {{ status.label }}
           </option>
@@ -252,7 +257,7 @@ export default {
       </div>
 
       <div class="form-actions">
-        <button type="submit" :disabled="isLoading || (!isEditable && !canChangeStatus)" class="save-button">
+        <button type="submit" :disabled="isLoading || (isNotEditable && cantChangeStatus)" class="save-button">
           {{ isEditing ? 'Salvar Edição' : 'Criar Pedido' }}
         </button>
         <button @click="$router.go(-1)" type="button" class="back-button">Voltar</button>

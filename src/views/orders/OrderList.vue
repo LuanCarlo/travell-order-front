@@ -73,7 +73,7 @@ export default {
       ];
       
       try {
-        let data = await axios.get(`orders/orderSatus`);
+        let data = await axios.get(`orders/orderStatus`);
 
         if (data.data?.status == 200 && data.data?.record?.length > 0) {
 

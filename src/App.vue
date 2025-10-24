@@ -1,7 +1,8 @@
 <template>
   <div id="app">
     <nav>
-      <router-link to="/">Home</router-link>
+      <router-link to="/">Home</router-link> |
+      <button @click="logout" class="logout-link-button">Sair</button>
     </nav>
     <notifications 
       position="top right"  
@@ -13,7 +14,31 @@
   </div>
 </template>
 
+<script>
+import axios from 'axios';
+// O componente precisa do $router para redirecionar
 
+export default {
+    name: 'App',
+    
+    methods: {
+        async logout() {
+            try {
+              await axios.post('logout'); 
+                
+            } catch (error) {
+                console.error("Erro ao tentar deslogar no servidor:", error);
+            } finally {
+                
+                localStorage.removeItem('userToken');
+                localStorage.removeItem('user'); 
+                
+                this.$router.push({ name: 'login' }); 
+            }
+        },
+    }
+};
+</script>
 
 <style>
 #app {
@@ -63,5 +88,23 @@ nav a.router-link-exact-active {
 
 .notifications {
     z-index: 9999;
+}
+
+.logout-link-button {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    
+    color: black;
+    cursor: pointer; 
+    text-decoration: none; 
+    font-size: 16px;
+    line-height: normal; 
+}
+
+.logout-link-button:hover {
+    text-decoration: underline;
+    color: #ff6e6e; 
 }
 </style>

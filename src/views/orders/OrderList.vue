@@ -31,7 +31,7 @@ export default {
       this.error = null;
       
       try {
-        let data = await axios.get(`orders`);
+        let data = await axios.get(`orders?filterStatus=${this.filterStatus}`);
 
         if (data.data?.status == 200 && data.data?.record?.length > 0) {
 
@@ -50,10 +50,12 @@ export default {
       this.isLoading = true;
       this.error = null;
 
-      let ordersStatus = [{value:null, label: 'Status'}];
+      let ordersStatus = [
+        {value:null, label: 'Selecione'}
+      ];
       
       try {
-        let data = await axios.get(`orders/orderSatus?filterStatus=${this.filterStatus}`);
+        let data = await axios.get(`orders/orderSatus`);
 
         if (data.data?.status == 200 && data.data?.record?.length > 0) {
 
@@ -133,10 +135,10 @@ export default {
         Limpar filtro
       </button>
       <select 
-        :value="filterStatus"
-        @change="getOrders()"
+        v-model="filterStatus"
+        @change="getOrders" 
         class="status-select"
-      >
+      >        
         <option 
           v-for="option in ordersStatus" 
           :key="option.value" 

@@ -15,12 +15,17 @@ export default {
       isLoading: true, 
       error: null,
       filterStatus: null,
-      api : process.env.VUE_APP_API_BASE_URL,       
+      user:null,
     };
   }, 
   mounted() {
     this.getOrders();
     this.getOrderStatus();
+
+    const userString = localStorage.getItem('user');
+    if (userString) {
+      this.user = JSON.parse(userString);
+    } 
 
   },
   
@@ -194,7 +199,7 @@ export default {
             >
               
               <select 
-                v-if="editingOrderId === order.id" 
+                v-if="editingOrderId === order.id && user.admin == 1" 
                 :value="order.order_status_id"
                 @change="updateStatus(order, $event.target.value, order.status)"
                 class="status-select-editable"

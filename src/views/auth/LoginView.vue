@@ -33,7 +33,7 @@ export default {
         const user = response.data.user;
         
         localStorage.setItem('userToken', token);
-        localStorage.setItem('user', user);
+        localStorage.setItem('user', JSON.stringify(user)); 
 
         this.$router.push({ path: '/ordersList' });
 

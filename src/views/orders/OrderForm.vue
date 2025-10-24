@@ -14,14 +14,15 @@ export default {
         destination: null,
         departure_date: this.formatDateForInput(new Date()),
         return_date: this.formatDateForInput(new Date()),
-        user_id: 1,
+        user_id: null,
       },
       isLoading: false,
       isEditing: false,
       errorMessage: null,
       successMessage: null,
       ordersStatus: [],
-      api : process.env.VUE_APP_API_BASE_URL,
+      user:null,
+
     };
   },
   
@@ -31,7 +32,17 @@ export default {
     if (this.$route.params.id) {
       this.isEditing = true;
       this.order.id = this.$route.params.id;
-      this.fetchOrder(this.order.id);
+      this.getOrder(this.order.id);
+    }
+
+    const userString = localStorage.getItem('user');
+    if (userString) {
+      this.user = JSON.parse(userString);
+    } 
+
+    if (this.isEditing == false && this.user) {
+      this.order.userName = this.user.name;
+      this.order.user_id = this.user.id;
     }
   },
 
@@ -50,9 +61,7 @@ export default {
         
         return formattedString;
     },
-    
- 
-    async fetchOrder(id) {
+    async getOrder(id) {
       this.isLoading = true;
       try {
         const data = await axios.get(`orders/getOrder/${id}`); 
@@ -60,6 +69,7 @@ export default {
         if (data.data.status == 200) {
 
             this.order = data.data.record;
+            this.order.userName = this.order.user.name;
         } else {
             this.errorMessage = 'Erro ao carregar os dados do pedido de viagem.';
         }
@@ -87,6 +97,8 @@ export default {
         if (this.isEditing) {
           response = await axios.put(`orders/update/${this.order.id}`, this.order);
           this.successMessage = 'Pedido atualizado com sucesso!';
+
+          
         } else {
           response =  await axios.post(`orders/`, this.order);
           this.successMessage = 'Pedido criado com sucesso!';
@@ -95,13 +107,36 @@ export default {
 
         }
 
+        this.$notify({
+          group: 'app-alerts',
+          title: 'Sucesso!',
+          text: this.successMessage,
+          type: 'success'
+        });
+
         setTimeout(() => {
-          this.$router.push({ name: 'OrderListView' });
+          this.$router.push({ name: 'ordersList' });
         }, 2000);
 
       } catch (error) {
-        this.errorMessage = 'Falha ao salvar o order. Verifique os dados.';
-        console.error(error);
+
+        this.isLoading = false;
+        let errorMsg = 'Erro ao tentar registrar. Verifique os dados.';
+        
+        if (error.response && error.response.status === 422) {
+            const errors = error.response.data.errors;
+            errorMsg = Object.values(errors).flat().join(' | ');
+        }
+        
+        this.errorMessage = errorMsg;
+        
+        this.$notify({
+            group: 'app-alerts',
+            title: 'Erro de Registro',
+            text: errorMsg,
+            type: 'error'
+        });
+        
       } finally {
         this.isLoading = false;
       }
@@ -128,11 +163,29 @@ export default {
       
         console.error("Falha ao buscar status:", err);
         this.error = 'Não foi possível carregar a lista de status. Tente novamente.';
+
+        
       } finally {
         this.isLoading = false;
       }
 
     },
+    isEditable() {
+
+      if ((this.user.id == this.order.user_id || this.user.admin == 1) && this.order.order_status_id == 1){
+        return true;
+      }
+
+      return false;
+    },
+    canChangeStatus() {
+
+      if (this.isEditing == true && this.user.admin != 1){
+        return false;
+      }
+
+      return true;
+    }
   },
   
   computed: {
@@ -145,7 +198,7 @@ export default {
 
 <template>
   <div class="form-container">
-    <LoadingSpinner :show="isLoading" text="Buscando pedidos de viagem..." />
+    <LoadingSpinner :show="isLoading" text="Salvando pedido de viagem..." />
 
     <h1 class="title">{{ pageTitle }}</h1>
 
@@ -160,7 +213,7 @@ export default {
       
       <div class="form-group">
         <label for="user_id">Solicitante</label>
-        <input id="user_id" v-model="order.user_id" type="text" required>
+        <input id="userName" v-model="order.userName" type="text" :disabled="true">
       </div>
 
       <div class="form-group">
@@ -180,7 +233,7 @@ export default {
       
       <div v-if="isEditing" class="form-group">
         <label for="status">Status Atual</label>
-        <select id="status" v-model="order.order_status_id">
+        <select id="status" v-model="order.order_status_id" :disabled="canChangeStatus">
           <option v-for="status in ordersStatus" :key="status.value" :value="status.value">
             {{ status.label }}
           </option>
@@ -188,7 +241,7 @@ export default {
       </div>
 
       <div class="form-actions">
-        <button type="submit" :disabled="isLoading" class="save-button">
+        <button type="submit" :disabled="isLoading || (!isEditable && !canChangeStatus)" class="save-button">
           {{ isEditing ? 'Salvar Edição' : 'Criar Pedido' }}
         </button>
         <button @click="$router.go(-1)" type="button" class="back-button">Voltar</button>

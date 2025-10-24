@@ -45,7 +45,7 @@ export default {
         const user = response.data.user;
         
         localStorage.setItem('userToken', token);
-        localStorage.setItem('userData', JSON.stringify(user)); 
+        localStorage.setItem('user', JSON.stringify(user)); 
 
         this.$notify({
             group: 'app-alerts',

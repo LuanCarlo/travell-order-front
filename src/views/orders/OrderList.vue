@@ -177,7 +177,7 @@ export default {
   <div class="orders-container">
     <LoadingSpinner :show="isLoading" text="Buscando pedidos de viagem..." />
     <div class="header">
-      <!-- <h1>Lista de Pedidos de Viagem</h1> -->
+      <h4>Lista de Pedidos de Viagem</h4>
 
       <div class="filter-group">
         <input 
@@ -307,23 +307,13 @@ export default {
 
 <style scoped>
 .orders-container {
-  max-width: 900px;
-  margin: 40px auto;
+  max-width: 1100px;
+  margin: 0px auto 40px auto;
   padding: 20px;
   background-color: #ffffff;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-
-/* .header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 25px;
-  border-bottom: 2px solid #eee;
-  padding-bottom: 15px;
-  gap: 15px;
-} */
 
 .header {
     display: flex; 

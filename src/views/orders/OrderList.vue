@@ -15,6 +15,10 @@ export default {
       isLoading: true, 
       error: null,
       filterStatus: null,
+      filterDestination: null,
+      filterDateStart:null,
+      filterDateEnd:null,
+      debounceTimeout: null,
       user:null,
     };
   }, 
@@ -35,17 +39,26 @@ export default {
       this.isLoading = true;
       this.error = null;
       
+      if (this.debounceTimeout) clearTimeout(this.debounceTimeout);
+      
+      const params = new URLSearchParams();
+      if (this.filterStatus) params.append('filterStatus', this.filterStatus);
+      if (this.filterDestination) params.append('filterDestination', this.filterDestination);
+      if (this.filterDateStart) params.append('filterDateStart', this.filterDateStart);
+      if (this.filterDateEnd) params.append('filterDateEnd', this.filterDateEnd); 
+      const queryString = params.toString();
+
       try {
-        let data = await axios.get(`orders?filterStatus=${this.filterStatus}`);
+        let data = await axios.get(`orders?${queryString}`);
 
         if (data.data?.status == 200 && data.data?.record?.length > 0) {
 
           this.orders = data.data.record;
         }
 
-      } catch (err) {
+      } catch (error) {
       
-        console.error("Falha ao buscar solicitações:", err);
+        console.error("Falha ao buscar solicitações:", error);
         this.error = 'Não foi possível carregar a lista de solicitações. Tente novamente.';
       } finally {
         this.isLoading = false;
@@ -71,9 +84,9 @@ export default {
 
         this.ordersStatus = ordersStatus;
 
-      } catch (err) {
+      } catch (error) {
       
-        console.error("Falha ao buscar status:", err);
+        console.error("Falha ao buscar status:", error);
         this.error = 'Não foi possível carregar a lista de status. Tente novamente.';
       } finally {
         this.isLoading = false;
@@ -121,8 +134,20 @@ export default {
         } 
       });
     },
+    debounceGetOrders() {
+      if (this.debounceTimeout) {
+          clearTimeout(this.debounceTimeout);
+      }
+      this.debounceTimeout = setTimeout(() => {
+          this.getOrders();
+      }, 500);
+    },
     clearFilter() {
 
+      this.filterStatus = null,
+      this.filterDestination = null,
+      this.filterDateStart = null,
+      this.filterDateEnd = null,
       this.filterStatus = null;
       this.getOrders();
     }
@@ -134,26 +159,58 @@ export default {
   <div class="orders-container">
     <LoadingSpinner :show="isLoading" text="Buscando pedidos de viagem..." />
     <div class="header">
-      <h1>Lista de Pedidos de Viagem</h1>
+      <!-- <h1>Lista de Pedidos de Viagem</h1> -->
 
-      <button @click="clearFilter()" class="clear-button">
-        Limpar filtro
-      </button>
-      <select 
+      <div class="filter-group">
+        <input 
+          id="destination-filter"
+          type="text" 
+          v-model="filterDestination" 
+          @input="debounceGetOrders" 
+          placeholder="Buscar por destino..."
+          class="text-filter"
+        />
+      </div>
+
+      <div class="filter-group date-filter-group">
+        <label for="date-start" class="filter-label">De:</label>
+        <input 
+          id="date-start" 
+          type="date" 
+          v-model="filterDateStart" 
+          @change="getOrders"
+          class="date-filter"
+        />
+        
+        <label for="date-end" class="filter-label">Até:</label>
+        <input 
+          id="date-end" 
+          type="date" 
+          v-model="filterDateEnd" 
+          @change="getOrders"
+          class="date-filter"
+        />
+      </div>
+
+      <select
         v-model="filterStatus"
-        @change="getOrders" 
-        class="status-select"
+        @change="getOrders"
+        class="status-select-filter"
       >        
-        <option 
-          v-for="option in ordersStatus" 
-          :key="option.value" 
+        <option
+          v-for="option in ordersStatus"
+          :key="option.value"
           :value="option.value"
         >
           {{ option.label }}
         </option>
       </select>
+      
+      <button @click="clearFilter()" class="clear-button">
+        Limpar
+      </button>
       <button @click="goToNewOrder" class="add-button">
-        + Novo Pedido
+        + Novo
       </button>
     </div>
 
@@ -240,7 +297,7 @@ export default {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.header {
+/* .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -248,6 +305,35 @@ export default {
   border-bottom: 2px solid #eee;
   padding-bottom: 15px;
   gap: 15px;
+} */
+
+.header {
+    display: flex; 
+    align-items: center;
+    gap: 15px; 
+    margin-bottom: 20px;
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+}
+
+.filter-label {
+  font-size: 12px;
+  margin-right: 5px;
+  white-space: nowrap; 
+}
+
+.text-filter, .date-filter, .status-select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.date-filter-group {
+    /* Ajusta o espaçamento dentro do grupo de datas */
+    gap: 5px; 
 }
 
 h1 {
@@ -264,6 +350,7 @@ h1 {
   cursor: pointer;
   font-size: 1em;
   transition: background-color 0.3s;
+  margin-left: auto;
 }
 
 
@@ -280,7 +367,6 @@ h1 {
   cursor: pointer;
   font-size: 1em;
   transition: background-color 0.3s;
-  margin-right: -6%;
 }
 
 /* Estilos da Lista */
@@ -424,6 +510,20 @@ h1 {
   background-size: 10px auto;
   
   cursor: pointer;
+}
+
+.status-select-filter {
+    padding: 10px 30px 10px 15px; 
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 12px;    
+    background-color: #f7f7f7; 
+    background-repeat: no-repeat;
+    background-position: right 10px top 50%;
+    background-size: 10px auto; 
+    
+    cursor: pointer;
+    transition: border-color 0.2s;
 }
 
 .status-select {
